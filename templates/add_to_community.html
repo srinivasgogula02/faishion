@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add to Community - f'AI'shion</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <header class="bg-primary text-white shadow-sm py-3">
+        <div class="container d-flex justify-content-between align-items-center">
+            <h1 class="h3 mb-0">f 'AI' shion</h1>
+            <nav>
+                <ul class="nav">
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{{ url_for('index') }}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{{ url_for('add_product') }}">Add Product</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{{ url_for('try_on') }}">Try On</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <main class="container my-4">
+        <div class="form-container">
+            <h2>Add to Community</h2>
+            <form id="addToCommunityForm" method="post" action="{{ url_for('add_to_community') }}">
+                <input type="hidden" name="top_garment_image_url" id="top_garment_image_url">
+                <input type="hidden" name="bottom_garment_image_url" id="bottom_garment_image_url">
+                <input type="hidden" name="outfit_image_url" id="outfit_image_url">
+
+                <div class="form-group">
+                    <label for="title">Title</label>
+                    <input type="text" class="form-control" id="title" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="top_garment_url">Top Garment Product URL</label>
+                    <input type="url" class="form-control" id="top_garment_url" name="top_garment_url" required>
+                </div>
+                <div class="form-group">
+                    <label for="top_garment_price">Top Garment Price</label>
+                    <input type="number" class="form-control" id="top_garment_price" name="top_garment_price" required>
+                </div>
+                <div class="form-group">
+                    <label for="bottom_garment_url">Bottom Garment Product URL</label>
+                    <input type="url" class="form-control" id="bottom_garment_url" name="bottom_garment_url" required>
+                </div>
+                <div class="form-group">
+                    <label for="bottom_garment_price">Bottom Garment Price</label>
+                    <input type="number" class="form-control" id="bottom_garment_price" name="bottom_garment_price" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+    </main>
+    <footer class="bg-primary text-white text-center py-3">
+        <p class="mb-0">© 2024 f'AI'shion. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            document.getElementById('top_garment_image_url').value = urlParams.get('top_garment_image_url');
+            document.getElementById('bottom_garment_image_url').value = urlParams.get('bottom_garment_image_url');
+            document.getElementById('outfit_image_url').value = urlParams.get('outfit_image_url');
+        });
+    </script>
+</body>
+</html>

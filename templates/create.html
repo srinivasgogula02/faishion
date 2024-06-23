@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create - f'AI'shion</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        .popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .popup-content {
+            position: relative;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+        }
+        .close-popup {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            font-size: 20px;
+        }
+        .loading-indicator {
+            margin: 20px 0;
+        }
+        #generatedImage {
+            max-width: 100%;
+            max-height: 300px;
+            margin: 20px 0;
+        }
+        .btn-community {
+            display: inline-block;
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .btn-community:hover {
+            background-color: #0056b3;
+        }
+        .created-items img {
+            max-width: 100px;
+            max-height: 100px;
+            margin: 10px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <header class="bg-primary text-white shadow-sm py-3">
+        <div class="container d-flex justify-content-between align-items-center">
+            <h1 class="h3 mb-0">f 'AI' shion</h1>
+            <nav>
+                <ul class="nav">
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{{ url_for('index') }}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{{ url_for('add_product') }}">Add Product</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{{ url_for('try_on') }}">Try On</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{{ url_for('create') }}">Create</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <main class="container my-4">
+        <div class="form-container">
+            <h2>Create Your Design</h2>
+            <div class="form-group">
+                <input type="text" class="form-control" id="inputText" placeholder="Enter your design idea">
+            </div>
+            <button type="button" class="btn btn-primary" id="createButton">Create</button>
+        </div>
+        <div class="created-items mt-4">
+            <h3>Created Designs</h3>
+            <div class="d-flex flex-wrap">
+                {% for item in created_items %}
+                <div class="created-item">
+                    <img src="{{ item.image_url }}" alt="{{ item.input_text }}">
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </main>
+    <footer class="bg-primary text-white text-center py-3">
+        <p class="mb-0">© 2024 f'AI'shion. All rights reserved.</p>
+    </footer>
+
+    <!-- Popup for Create -->
+    <div class="popup" id="createPopup">
+        <div class="popup-content">
+            <span class="close-popup" id="closePopup">&times;</span>
+            <div id="loadingIndicator" class="loading-indicator">Loading...</div>
+            <img id="generatedImage" src="" alt="Generated Image" style="display: none;">
+            <button class="btn-community" id="addToCommunityButton" style="display: none;">Add to Community</button>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.getElementById('createButton').addEventListener('click', function() {
+            var inputText = document.getElementById('inputText').value;
+            
+            document.getElementById('createPopup').style.display = 'flex';
+            document.getElementById('loadingIndicator').style.display = 'block';
+            document.getElementById('generatedImage').style.display = 'none';
+            document.getElementById('addToCommunityButton').style.display = 'none';
+            
+            fetch('/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ input_text: inputText })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('generatedImage').src = data.image_url;
+                document.getElementById('loadingIndicator').style.display = 'none';
+                document.getElementById('generatedImage').style.display = 'block';
+                document.getElementById('addToCommunityButton').style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('loadingIndicator').textContent = 'Error generating image';
+            });
+        });
+
+        document.getElementById('addToCommunityButton').addEventListener('click', function() {
+            var inputText = document.getElementById('inputText').value;
+            var imageUrl = document.getElementById('generatedImage').src;
+
+            fetch('/add_to_community2', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    input_text: inputText,
+                    image_url: imageUrl
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    document.getElementById('createPopup').style.display = 'none';
+                    location.reload();  // Reload the page to display the newly added item
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+
+        document.getElementById('closePopup').addEventListener('click', function() {
+            document.getElementById('createPopup').style.display = 'none';
+        });
+    </script>
+</body>
+</html>
